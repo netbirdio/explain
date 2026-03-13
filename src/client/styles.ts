@@ -86,6 +86,13 @@ export const chatHeaderIcon: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  flexShrink: 0,
+};
+
+export const chatHeaderText: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
 };
 
 export const chatHeaderTitle: React.CSSProperties = {
@@ -99,6 +106,8 @@ export const chatHeaderTitle: React.CSSProperties = {
 export const chatHeaderSubtitle: React.CSSProperties = {
   fontSize: 11,
   color: "var(--nb-explain-text-dim)",
+  lineHeight: 1,
+  marginTop: 2,
 };
 
 export const chatCloseBtn: React.CSSProperties = {

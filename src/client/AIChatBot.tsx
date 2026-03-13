@@ -186,7 +186,7 @@ export default function AIChatBot({
           <div style={S.chatHeaderIcon}>
             <Sparkles size={15} style={{ color: "var(--nb-explain-accent)" }} />
           </div>
-          <div>
+          <div style={S.chatHeaderText}>
             <h3 style={S.chatHeaderTitle}>{title}</h3>
             <span style={S.chatHeaderSubtitle}>{subtitle}</span>
           </div>

@@ -40,6 +40,8 @@ type AIAssistantProviderProps = {
   endpoint: string;
   apiKey?: string;
   children: React.ReactNode;
+  title?: string;
+  subtitle?: string;
 };
 
 /**
@@ -117,6 +119,8 @@ export default function AIAssistantProvider({
   endpoint,
   apiKey,
   children,
+  title,
+  subtitle,
 }: AIAssistantProviderProps) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [initialQuery, setInitialQuery] = useState("");
@@ -282,6 +286,8 @@ export default function AIAssistantProvider({
         initialQuery={initialQuery}
         endpoint={endpoint}
         apiKey={apiKey}
+        title={title}
+        subtitle={subtitle}
       />
     </AIAssistantContext.Provider>
   );

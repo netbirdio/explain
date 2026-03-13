@@ -1,5 +1,5 @@
 {
-  "name": "netbird-explain",
+  "name": "@netbirdio/explain",
   "version": "0.1.0",
   "description": "Full-stack AI assistant library with React frontend components and Node.js backend handler",
   "license": "BSD-3-Clause",

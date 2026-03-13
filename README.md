@@ -1,18 +1,18 @@
-# netbird-explain
+# @netbirdio/explain
 
 AI-powered "Explain" assistant for React apps. Users click on UI elements and get contextual AI explanations via a chat panel.
 
 The package has two entry points:
 
-- `netbird-explain/client` — React components (provider, chat panel, floating button)
-- `netbird-explain/server` — Node.js handler that proxies requests to Anthropic or OpenAI
+- `@netbirdio/explain/client` — React components (provider, chat panel, floating button)
+- `@netbirdio/explain/server` — Node.js handler that proxies requests to Anthropic or OpenAI
 
 No CSS framework required — the package is fully self-contained with inline styles and CSS custom properties.
 
 ## Installation
 
 ```bash
-npm install netbird-explain
+npm install @netbirdio/explain
 ```
 
 Peer dependencies: `react >=18`, `react-dom >=18`.
@@ -22,7 +22,7 @@ For local development as a workspace package, add it to your `package.json`:
 ```json
 {
   "dependencies": {
-    "netbird-explain": "file:./packages/netbird-explain"
+    "@netbirdio/explain": "file:./packages/@netbirdio/explain"
   }
 }
 ```
@@ -31,7 +31,7 @@ If you're using Next.js, add to `next.config.js`:
 
 ```js
 module.exports = {
-  transpilePackages: ["netbird-explain"],
+  transpilePackages: ["@netbirdio/explain"],
 };
 ```
 
@@ -44,7 +44,7 @@ module.exports = {
 Wrap your app with `AIAssistantProvider`:
 
 ```tsx
-import { AIAssistantProvider } from "netbird-explain/client";
+import { AIAssistantProvider } from "@netbirdio/explain/client";
 
 export default function App({ children }) {
   return (
@@ -112,7 +112,7 @@ Use `data-nb-explain-ignore` to prevent an element from being selectable in expl
 Use the `useAIAssistant` hook to provide context that gets included in every query:
 
 ```tsx
-import { useAIAssistant } from "netbird-explain/client";
+import { useAIAssistant } from "@netbirdio/explain/client";
 
 function MyModal() {
   const { setExplainContext, clearExplainContext } = useAIAssistant();
@@ -222,7 +222,7 @@ The server module provides a framework-agnostic handler that proxies chat reques
 
 ```ts
 import express from "express";
-import { createAssistant } from "netbird-explain/server";
+import { createAssistant } from "@netbirdio/explain/server";
 
 const assistant = createAssistant({
   provider: "anthropic",
@@ -243,7 +243,7 @@ app.listen(3080);
 
 ```ts
 import http from "http";
-import { createAssistant } from "netbird-explain/server";
+import { createAssistant } from "@netbirdio/explain/server";
 
 const assistant = createAssistant({
   provider: "openai",
@@ -341,7 +341,7 @@ Environment variables:
 
 ```tsx
 // layout.tsx — wrap app with provider
-import { AIAssistantProvider } from "netbird-explain/client";
+import { AIAssistantProvider } from "@netbirdio/explain/client";
 
 export default function Layout({ children }) {
   return (
@@ -357,7 +357,7 @@ export default function Layout({ children }) {
 
 ```tsx
 // MyModal.tsx — add explain support to a modal
-import { useAIAssistant } from "netbird-explain/client";
+import { useAIAssistant } from "@netbirdio/explain/client";
 import { Sparkles } from "lucide-react";
 
 function MyModal() {

@@ -18,6 +18,8 @@ type Props = {
   initialQuery: string;
   endpoint: string;
   apiKey?: string;
+  title?: string;
+  subtitle?: string;
 };
 
 async function fetchAIResponse(
@@ -58,6 +60,8 @@ export default function AIChatBot({
   initialQuery,
   endpoint,
   apiKey,
+  title = "AI Assistant",
+  subtitle = "Ask anything",
 }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -183,8 +187,8 @@ export default function AIChatBot({
             <Sparkles size={15} style={{ color: "var(--nb-explain-accent)" }} />
           </div>
           <div>
-            <h3 style={S.chatHeaderTitle}>AI Assistant</h3>
-            <span style={S.chatHeaderSubtitle}>Ask anything</span>
+            <h3 style={S.chatHeaderTitle}>{title}</h3>
+            <span style={S.chatHeaderSubtitle}>{subtitle}</span>
           </div>
         </div>
         <button

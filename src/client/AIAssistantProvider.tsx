@@ -205,11 +205,8 @@ export default function AIAssistantProvider({
 
       if (onExplain) {
         onExplain({ label, query, context: explainCtx, docs: elementDocs, element: explainable });
-        setExplainMode(false);
-        setHoveredEl(null);
-      } else {
-        openChat(query);
       }
+      openChat(query);
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {

@@ -8,3 +8,13 @@ export type ProviderConfig = {
   apiKey: string;
   model?: string;
 };
+
+/**
+ * Middleware that can transform messages before they reach the LLM.
+ * Useful for RAG context injection, logging, filtering, etc.
+ * Return the (possibly modified) messages array.
+ */
+export type Middleware = (
+  messages: Message[],
+  systemPrompt?: string,
+) => Promise<{ messages: Message[]; systemPrompt?: string }>;

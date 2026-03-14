@@ -1,13 +1,14 @@
 import type { Message } from "../types";
 import { AnthropicProvider } from "./providers/anthropic";
 import { OpenAIProvider } from "./providers/openai";
-import type { LLMProvider } from "./providers/types";
+import type { LLMProvider, Middleware } from "./providers/types";
 
 export type AssistantConfig = {
-  provider: "anthropic" | "openai";
-  apiKey: string;
+  provider: "anthropic" | "openai" | LLMProvider;
+  apiKey?: string;
   model?: string;
   systemPrompt?: string;
+  middleware?: Middleware[];
 };
 
 type HandlerOptions = {
@@ -93,6 +94,12 @@ async function parseBody(req: IncomingRequest): Promise<unknown> {
 }
 
 function createProvider(config: AssistantConfig): LLMProvider {
+  if (typeof config.provider === "object") {
+    return config.provider;
+  }
+  if (!config.apiKey) {
+    throw new Error("apiKey is required when using a built-in provider");
+  }
   switch (config.provider) {
     case "anthropic":
       return new AnthropicProvider({ apiKey: config.apiKey, model: config.model });
@@ -105,12 +112,23 @@ function createProvider(config: AssistantConfig): LLMProvider {
 
 export function createAssistant(config: AssistantConfig) {
   const provider = createProvider(config);
+  const middlewares = config.middleware || [];
 
   async function chat(req: ChatRequest): Promise<ChatResponse> {
     if (!req.messages || !Array.isArray(req.messages) || req.messages.length === 0) {
       throw new Error("messages array is required and must not be empty");
     }
-    const reply = await provider.chat(req.messages, config.systemPrompt);
+
+    let messages = req.messages;
+    let systemPrompt = config.systemPrompt;
+
+    for (const mw of middlewares) {
+      const result = await mw(messages, systemPrompt);
+      messages = result.messages;
+      systemPrompt = result.systemPrompt;
+    }
+
+    const reply = await provider.chat(messages, systemPrompt);
     return { reply };
   }
 

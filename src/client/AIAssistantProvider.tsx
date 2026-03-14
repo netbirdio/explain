@@ -7,7 +7,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import type { ExplainContext } from "../types";
+import type { ExplainContext, ExplainEvent } from "../types";
 import AIChatBot from "./AIChatBot";
 import AIFloatingButton from "./AIFloatingButton";
 import * as S from "./styles";
@@ -42,6 +42,8 @@ type AIAssistantProviderProps = {
   children: React.ReactNode;
   title?: string;
   subtitle?: string;
+  onExplain?: (event: ExplainEvent) => void;
+  showChat?: boolean;
 };
 
 /**
@@ -121,6 +123,8 @@ export default function AIAssistantProvider({
   children,
   title,
   subtitle,
+  onExplain,
+  showChat = true,
 }: AIAssistantProviderProps) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [initialQuery, setInitialQuery] = useState("");
@@ -198,7 +202,14 @@ export default function AIAssistantProvider({
 
       const elementDocs = findExplainDocs(explainable);
       const query = buildQuery(label, explainCtx, elementDocs);
-      openChat(query);
+
+      if (onExplain) {
+        onExplain({ label, query, context: explainCtx, docs: elementDocs, element: explainable });
+        setExplainMode(false);
+        setHoveredEl(null);
+      } else {
+        openChat(query);
+      }
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -218,7 +229,7 @@ export default function AIAssistantProvider({
       document.removeEventListener("click", handleClick, true);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [explainMode, explainCtx, openChat, exitExplainMode]);
+  }, [explainMode, explainCtx, openChat, exitExplainMode, onExplain]);
 
   // Apply/remove highlight on hovered explainable element via CSS class
   useEffect(() => {
@@ -269,26 +280,30 @@ export default function AIAssistantProvider({
         </div>
       )}
 
-      <AIFloatingButton
-        isOpen={isChatOpen}
-        onClick={() => {
-          if (isChatOpen) {
-            closeChat();
-          } else {
-            openChat();
-          }
-        }}
-      />
+      {showChat && (
+        <>
+          <AIFloatingButton
+            isOpen={isChatOpen}
+            onClick={() => {
+              if (isChatOpen) {
+                closeChat();
+              } else {
+                openChat();
+              }
+            }}
+          />
 
-      <AIChatBot
-        open={isChatOpen}
-        onClose={closeChat}
-        initialQuery={initialQuery}
-        endpoint={endpoint}
-        apiKey={apiKey}
-        title={title}
-        subtitle={subtitle}
-      />
+          <AIChatBot
+            open={isChatOpen}
+            onClose={closeChat}
+            initialQuery={initialQuery}
+            endpoint={endpoint}
+            apiKey={apiKey}
+            title={title}
+            subtitle={subtitle}
+          />
+        </>
+      )}
     </AIAssistantContext.Provider>
   );
 }

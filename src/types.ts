@@ -9,3 +9,11 @@ export type ExplainContext = {
   pageName?: string;
   docsUrls?: string[];
 };
+
+export type ExplainEvent = {
+  label: string;
+  query: string;
+  context: ExplainContext | null;
+  docs: string[];
+  element: HTMLElement;
+};

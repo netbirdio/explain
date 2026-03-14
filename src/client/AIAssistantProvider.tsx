@@ -249,6 +249,20 @@ export default function AIAssistantProvider({
     }
   }, [explainMode]);
 
+  // Inject global styles via DOM to avoid SSR hydration mismatch
+  // (inline <style> tags with quotes get HTML-escaped differently on server vs client)
+  useEffect(() => {
+    const id = "nb-explain-styles";
+    if (document.getElementById(id)) return;
+    const style = document.createElement("style");
+    style.id = id;
+    style.textContent = S.CSS_VARS + S.ANIMATIONS + S.HIGHLIGHT_STYLES;
+    document.head.appendChild(style);
+    return () => {
+      style.remove();
+    };
+  }, []);
+
   return (
     <AIAssistantContext.Provider
       value={{
@@ -262,9 +276,6 @@ export default function AIAssistantProvider({
         clearExplainContext,
       }}
     >
-      {/* Inject CSS custom properties, animations, and highlight styles */}
-      <style>{S.CSS_VARS + S.ANIMATIONS + S.HIGHLIGHT_STYLES}</style>
-
       {children}
 
       {/* Explain mode banner */}

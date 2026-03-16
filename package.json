@@ -1,6 +1,6 @@
 {
   "name": "@netbirdio/explain",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Full-stack AI assistant library with React frontend components and Node.js backend handler",
   "license": "BSD-3-Clause",
   "main": "./dist/client/index.js",

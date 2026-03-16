@@ -1,12 +1,14 @@
 import type { Message } from "../types";
 import { AnthropicProvider } from "./providers/anthropic";
+import { DifyProvider } from "./providers/dify";
 import { OpenAIProvider } from "./providers/openai";
 import type { LLMProvider, Middleware } from "./providers/types";
 
 export type AssistantConfig = {
-  provider: "anthropic" | "openai" | LLMProvider;
+  provider: "anthropic" | "openai" | "dify" | LLMProvider;
   apiKey?: string;
   model?: string;
+  baseUrl?: string;
   systemPrompt?: string;
   middleware?: Middleware[];
 };
@@ -105,6 +107,8 @@ function createProvider(config: AssistantConfig): LLMProvider {
       return new AnthropicProvider({ apiKey: config.apiKey, model: config.model });
     case "openai":
       return new OpenAIProvider({ apiKey: config.apiKey, model: config.model });
+    case "dify":
+      return new DifyProvider({ apiKey: config.apiKey, baseUrl: config.baseUrl });
     default:
       throw new Error(`Unknown provider: ${config.provider}`);
   }

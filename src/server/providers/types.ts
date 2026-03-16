@@ -7,6 +7,7 @@ export interface LLMProvider {
 export type ProviderConfig = {
   apiKey: string;
   model?: string;
+  baseUrl?: string;
 };
 
 /**

@@ -12,6 +12,8 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { Message } from "../types";
 import * as S from "./styles";
 
+export type MessageRenderer = (message: Message) => React.ReactNode;
+
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -20,6 +22,7 @@ type Props = {
   apiKey?: string;
   title?: string;
   subtitle?: string;
+  renderMessage?: MessageRenderer;
 };
 
 async function fetchAIResponse(
@@ -54,6 +57,25 @@ async function fetchAIResponse(
   return data.reply;
 }
 
+function defaultRenderMessage(msg: Message): React.ReactNode {
+  return msg.content.split("\n").map((line, i) => (
+    <React.Fragment key={i}>
+      {line
+        .split(/(\*\*[^*]+\*\*)/)
+        .map((part, j) =>
+          part.startsWith("**") && part.endsWith("**") ? (
+            <strong key={j} style={S.messageBold}>
+              {part.slice(2, -2)}
+            </strong>
+          ) : (
+            <React.Fragment key={j}>{part}</React.Fragment>
+          ),
+        )}
+      {i < msg.content.split("\n").length - 1 && <br />}
+    </React.Fragment>
+  ));
+}
+
 export default function AIChatBot({
   open,
   onClose,
@@ -62,6 +84,7 @@ export default function AIChatBot({
   apiKey,
   title = "AI Assistant",
   subtitle = "Ask anything",
+  renderMessage,
 }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -244,22 +267,9 @@ export default function AIChatBot({
                 </div>
               )}
               <div style={S.messageBubble(msg.role === "user")}>
-                {msg.content.split("\n").map((line, i) => (
-                  <React.Fragment key={i}>
-                    {line
-                      .split(/(\*\*[^*]+\*\*)/)
-                      .map((part, j) =>
-                        part.startsWith("**") && part.endsWith("**") ? (
-                          <strong key={j} style={S.messageBold}>
-                            {part.slice(2, -2)}
-                          </strong>
-                        ) : (
-                          <React.Fragment key={j}>{part}</React.Fragment>
-                        ),
-                      )}
-                    {i < msg.content.split("\n").length - 1 && <br />}
-                  </React.Fragment>
-                ))}
+                {renderMessage
+                  ? renderMessage(msg)
+                  : defaultRenderMessage(msg)}
               </div>
               {msg.role === "user" && (
                 <div style={S.messageAvatar(true)}>

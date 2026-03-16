@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 import type { ExplainContext, ExplainEvent } from "../types";
-import AIChatBot from "./AIChatBot";
+import AIChatBot, { type MessageRenderer } from "./AIChatBot";
 import AIFloatingButton from "./AIFloatingButton";
 import * as S from "./styles";
 
@@ -44,6 +44,7 @@ type AIAssistantProviderProps = {
   subtitle?: string;
   onExplain?: (event: ExplainEvent) => void;
   showChat?: boolean;
+  renderMessage?: MessageRenderer;
 };
 
 /**
@@ -125,6 +126,7 @@ export default function AIAssistantProvider({
   subtitle,
   onExplain,
   showChat = true,
+  renderMessage,
 }: AIAssistantProviderProps) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [initialQuery, setInitialQuery] = useState("");
@@ -309,6 +311,7 @@ export default function AIAssistantProvider({
             apiKey={apiKey}
             title={title}
             subtitle={subtitle}
+            renderMessage={renderMessage}
           />
         </>
       )}

@@ -2,7 +2,7 @@ import type { Message } from "../types";
 import { AnthropicProvider } from "./providers/anthropic";
 import { DifyProvider } from "./providers/dify";
 import { OpenAIProvider } from "./providers/openai";
-import type { LLMProvider, Middleware } from "./providers/types";
+import type { LLMProvider, Middleware, Tool } from "./providers/types";
 
 export type AssistantConfig = {
   provider: "anthropic" | "openai" | "dify" | LLMProvider;
@@ -11,6 +11,7 @@ export type AssistantConfig = {
   baseUrl?: string;
   systemPrompt?: string;
   middleware?: Middleware[];
+  tools?: Tool[];
 };
 
 type HandlerOptions = {
@@ -132,7 +133,7 @@ export function createAssistant(config: AssistantConfig) {
       systemPrompt = result.systemPrompt;
     }
 
-    const reply = await provider.chat(messages, systemPrompt);
+    const reply = await provider.chat(messages, systemPrompt, config.tools);
     return { reply };
   }
 

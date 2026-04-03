@@ -3,4 +3,4 @@ export type { AssistantConfig } from "./handler";
 export { AnthropicProvider } from "./providers/anthropic";
 export { DifyProvider } from "./providers/dify";
 export { OpenAIProvider } from "./providers/openai";
-export type { LLMProvider, ProviderConfig, Middleware } from "./providers/types";
+export type { LLMProvider, ProviderConfig, Middleware, Tool } from "./providers/types";

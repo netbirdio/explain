@@ -1,7 +1,14 @@
 import type { Message } from "../../types";
 
+export type Tool = {
+  name: string;
+  description: string;
+  input_schema: Record<string, unknown>;
+  execute: (input: Record<string, unknown>) => Promise<string>;
+};
+
 export interface LLMProvider {
-  chat(messages: Message[], systemPrompt?: string): Promise<string>;
+  chat(messages: Message[], systemPrompt?: string, tools?: Tool[]): Promise<string>;
 }
 
 export type ProviderConfig = {

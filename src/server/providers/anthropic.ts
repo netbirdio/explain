@@ -1,5 +1,5 @@
 import type { Message } from "../../types";
-import type { LLMProvider, ProviderConfig, Tool } from "./types";
+import type { LLMProvider, McpServer, ProviderConfig, Tool } from "./types";
 
 type AnthropicMessage = {
   role: "user" | "assistant";
@@ -20,17 +20,36 @@ export class AnthropicProvider implements LLMProvider {
     this.model = config.model || "claude-sonnet-4-20250514";
   }
 
-  async chat(messages: Message[], systemPrompt?: string, tools?: Tool[]): Promise<string> {
+  async chat(messages: Message[], systemPrompt?: string, tools?: Tool[], mcpServers?: McpServer[]): Promise<string> {
     const anthropicMessages: AnthropicMessage[] = messages.map((m) => ({
       role: m.role === "context" || m.role === "system" ? ("user" as const) : m.role,
       content: m.role === "context" ? `[Context]: ${m.content}` : m.content,
     }));
 
-    const toolDefs = tools?.map((t) => ({
-      name: t.name,
-      description: t.description,
-      input_schema: t.input_schema,
-    }));
+    const toolDefs: Record<string, unknown>[] = [];
+
+    if (tools?.length) {
+      for (const t of tools) {
+        toolDefs.push({
+          name: t.name,
+          description: t.description,
+          input_schema: t.input_schema,
+        });
+      }
+    }
+
+    if (mcpServers?.length) {
+      for (const mcp of mcpServers) {
+        const mcpTool: Record<string, unknown> = {
+          type: "mcp",
+          server_label: mcp.server_label,
+          server_url: mcp.server_url,
+        };
+        if (mcp.headers) mcpTool.headers = mcp.headers;
+        if (mcp.allowed_tools) mcpTool.allowed_tools = mcp.allowed_tools;
+        toolDefs.push(mcpTool);
+      }
+    }
 
     const toolsByName = new Map(tools?.map((t) => [t.name, t]));
 
@@ -52,13 +71,19 @@ export class AnthropicProvider implements LLMProvider {
         body.tools = toolDefs;
       }
 
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        "x-api-key": this.apiKey,
+        "anthropic-version": "2023-06-01",
+      };
+
+      if (mcpServers?.length) {
+        headers["anthropic-beta"] = "mcp-client-2025-04-04";
+      }
+
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": this.apiKey,
-          "anthropic-version": "2023-06-01",
-        },
+        headers,
         body: JSON.stringify(body),
       });
 
@@ -76,6 +101,12 @@ export class AnthropicProvider implements LLMProvider {
         lastTextResponse = textBlock.text;
       }
 
+      // MCP server-side tools hit iteration limit — re-send to continue
+      if (data.stop_reason === "pause_turn") {
+        anthropicMessages.push({ role: "assistant", content: data.content });
+        continue;
+      }
+
       if (data.stop_reason !== "tool_use") {
         if (!lastTextResponse) {
           throw new Error("No text content in Anthropic response");
@@ -83,7 +114,7 @@ export class AnthropicProvider implements LLMProvider {
         return lastTextResponse;
       }
 
-      // Handle tool calls
+      // Handle client-side tool calls
       const toolUseBlocks = data.content.filter(
         (block: { type: string }) => block.type === "tool_use",
       );

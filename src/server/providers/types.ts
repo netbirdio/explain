@@ -7,8 +7,15 @@ export type Tool = {
   execute: (input: Record<string, unknown>) => Promise<string>;
 };
 
+export type McpServer = {
+  server_label: string;
+  server_url: string;
+  headers?: Record<string, string>;
+  allowed_tools?: string[];
+};
+
 export interface LLMProvider {
-  chat(messages: Message[], systemPrompt?: string, tools?: Tool[]): Promise<string>;
+  chat(messages: Message[], systemPrompt?: string, tools?: Tool[], mcpServers?: McpServer[]): Promise<string>;
 }
 
 export type ProviderConfig = {
